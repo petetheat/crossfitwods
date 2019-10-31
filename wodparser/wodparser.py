@@ -3,12 +3,23 @@ import sys
 import requests
 import pandas as pd
 import re
+import networkx as nx
+import matplotlib.pyplot as plt
+from collections import Counter
 
 
 class WodParser:
     def __init__(self, dates):
         self.wods_raw, self.failed_dates = self.get_wods(dates)
         self.wods_clean = self.clean_wods()
+
+        self.wods = []
+
+        for i in self.wods_clean.keys():
+            if list(self.wods_clean[i]):
+                self.wods.append(list(self.wods_clean[i]))
+
+        self.df, self.movements = self.get_df()
 
     def get_wods(self, dates):
         wods = {}
@@ -67,7 +78,51 @@ class WodParser:
 
         return wods_clean
 
+    def get_df(self):
+        movement_counter = Counter()
+        for wod in self.wods:
+            for movement in wod:
+                movement_counter[movement] += 1
 
+        df = pd.DataFrame(movement_counter.most_common(), columns=['Movement', 'Counts'])
+        df['Percentage'] = df['Counts'] / len(self.wods) * 100
+
+        movements = list(movement_counter.keys())
+
+        return df, movements
+
+    def plot(self):
+        fig, ax = plt.subplots(figsize=(20, 20))
+        mygraph = nx.Graph()
+
+        options = {'node_color': 'red',
+                   'node_size': 100,
+                   'width': 1,
+                   'edge_color': '#8c8c8b'}
+
+        # add nodes
+        for movement in self.movements:
+            mygraph.add_node(movement)
+
+        edges = []
+        for movement in self.movements:
+            for wod in self.wods:
+                if movement in wod:
+                    for second_movement in wod:
+                        if movement != second_movement:
+                            edges.append((movement, second_movement))
+
+        for edge in edges:
+            mygraph.add_edge(edge[0], edge[1])
+
+        pos = nx.spring_layout(mygraph)
+        nx.draw(mygraph, pos, ax=ax, **options)
+
+        for i in pos:
+            ax.text(pos[i][0], pos[i][1], i, fontsize=12)
+
+        # show graph
+        plt.show()
 
 
 if __name__ == "__main__":
