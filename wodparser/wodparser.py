@@ -51,10 +51,11 @@ class WodParser:
         return wods, failed_dates
 
     def clean_wods(self):
+        print('yo')
         wod_regex1 = '(pull|push|muscle|(ghd\s)?sit|handstand push)[-]?up|(front[\s]?|back[\s]?|overhead[\s]?|single(-|\s)leg[\s]?|one(-|\s)legged[\s]?)?squat(\sclean|\ssnatch)?|wall(-|[\s])?ball|(sumo\s)?dead[\s]?lift'
         wod_regex2 = '|(shoulder|push|bench|sots|split)\s(press|jerk)|(hip|back)[\s]?extension|knee[s]?(-|\s)to(-|\s)elbow|sprint|rope\sclimb|dip|swim|bike|handstand\swalk|turkish\sget[-]?up|wall(-|\s)?walk|(kettlebell\sswing)'
         wod_regex3 = '|(bent\sover(\sbarbell)?\s)?row|pistol|(power\s|dumbbell\s)?(clean|snatch(es)?)(\sbalance|(\sand\s|\s&\s)jerk)?|(box\s)?step(-|\s)up|(single|double|triple)[-]?under|thruster'
-        wod_regex4 = '|run|(burpee[\s]?)?(box(-|\s)jump[\s]?)(over)?|(walking\s)?lunge|(broad)[-]?jump|(toes(-|\s)to(-|\s)bar)|plank|l(-|\s)sit'
+        wod_regex4 = '|run|burpee(\s)?(box(-|\s)jump[\s]?(over)?)?|(walking\s)?lunge|(broad)[-]?jump|(toes(-|\s)to(-|\s)bar)|plank|l(-|\s)sit'
 
         wod_regex = wod_regex1 + wod_regex2 + wod_regex3 + wod_regex4
 
@@ -73,6 +74,7 @@ class WodParser:
             wod_movements = [mv.replace('bentoverbarbell', 'bentover') for mv in wod_movements]
             wod_movements = [mv.replace('singlelegsquat', 'pistols') for mv in wod_movements]
             wod_movements = [mv.replace('oneleggedsquat', 'pistols') for mv in wod_movements]
+            wod_movements = [mv.replace('pistols', 'pistol') for mv in wod_movements]
             wod_movements = [mv.replace('&', 'and') for mv in wod_movements]
             wods_clean[w] = wod_movements
 
